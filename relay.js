@@ -1,5 +1,5 @@
 /*!
- * relay        module integration utility
+ * submix       module integration utility
  * @author      Ryan Van Etten
  * @link        http://github.com/ryanve/relay
  * @license     MIT
@@ -11,7 +11,7 @@
 
 (function(root, name, make) {
     typeof module != 'undefined' && module['exports'] ? module['exports'] = make() : root[name] = make();
-}(this, 'relay', function() {
+}(this, 'submix', function() {
 
     var globe = this || window;
 

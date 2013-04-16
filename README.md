@@ -1,4 +1,4 @@
-[relay](https://github.com/ryanve/relay)
+[submix](https://github.com/ryanve/submix)
 =====
 
 module integration utility
