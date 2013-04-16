@@ -1,14 +1,14 @@
 {
     "name": "submix",
     "description": "module integration utility",
-    "version": "0.1.0",
-    "homepage": "https://github.com/ryanve/relay",
+    "version": "0.2.0",
+    "homepage": "https://github.com/ryanve/submix",
     "author": "Ryan Van Etten <ryanve@gmail.com> (http://ryanve.com)",
     "keywords": ["integration", "utility", "ender"],
-    "main": "./relay.js",
+    "main": "./submix.js",
     "ender": "./ender.js",
     "repository": {
         "type": "git",
-        "url": "https://github.com/ryanve/relay.git"
+        "url": "https://github.com/ryanve/submix.git"
     }
 }
