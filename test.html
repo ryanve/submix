@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8">
     <link rel="dns-prefetch" href="//airve.com">
-    <title>relay: test suite</title>
+    <title>submix: test suite</title>
     <meta name=viewport content="width=device-width,initial-scale=1.0">
-    <meta name=description content="JavaScript test suite for relay.js">
+    <meta name=description content="JavaScript test suite for submix.js">
     <meta name=author content="Ryan Van Etten">
     <link rel=stylesheet href="http://airve.com/css/sitewide.201301233.css">
     <style>
@@ -15,7 +15,7 @@
 <body>
 
 <h1>
-    <a href="http://github.com/ryanve/relay">relay</a>: test suite
+    <a href="http://github.com/ryanve/submix">submix</a>: test suite
 </h1>
 
 <main id="main" role="main"></main>
@@ -23,14 +23,17 @@
 <script src="http://airve.github.io/js/aok/aok.min.js"></script>
 <script src="http://airve.github.io/js/elo/elo.min.js"></script>
 <script src="http://airve.github.io/js/vibe/vibe.min.js"></script>
-<script src="relay.js"></script>
+<script src="submix.js"></script>
 <script>
-    (function(document, aok, relay, vibe, elo) {
-        aok.log(relay);
-        aok.log(relay.bridge({}))
-        aok.log(relay.submix.call({ fn: {} }, aok, vibe, elo ));
-        aok.log(relay.submix(elo, oi, false));
-    }(document, aok, relay, vibe, elo));
+    (function(document, aok, submix, vibe, elo) {
+        aok.log(submix);
+        aok.log(submix.bridge({}))
+        aok.log(submix.call({ fn: {} }, aok, vibe, elo ));
+        aok.log(submix.submix(elo, vibe, false));
+        aok(typeof submix == 'function');
+        aok(typeof submix.bridge == 'function');
+        aok(submix === submix.submix);
+    }(document, aok, submix, vibe, elo));
 </script>
 </body>
 </html>
