@@ -3,7 +3,7 @@
  * @author      Ryan Van Etten
  * @link        http://github.com/ryanve/submix
  * @license     MIT
- * @version     0.3.3
+ * @version     0.4.0
  */
 
 /*jshint expr:true, laxcomma:true, sub:true, supernew:true, debug:true, node:true, boss:true, evil:true, 
@@ -34,9 +34,7 @@
      */
     function bridge(r, send, $) {
         var k, custom, force, s = this;
-        if (s === globe) {
-            throw new Error('@this'); 
-        }
+        if (s === globe) { throw new Error('@this'); }
         custom = s['bridge'];
         if (custom !== bridge && typeof custom == 'function' && custom['send'] === false) {
             return custom.apply(s, arguments);
@@ -57,25 +55,37 @@
         return r;
     }
 
-    // signify that the bridge is universal
+    // certify that the bridge is universal
     bridge['send'] = true;
     
+    
     /**
-     * @this   {Object|Function} receiver
-     * @param  {...}             suppliers
+     * Like bridge, but with semi-inverted signature
+     * @this   {Object|Function}            receiver
+     * @param  {Object|Function}     s      supplier
+     * @param  {(boolean|Function)=} send
+     * @param  {*=}                  $
      */
-    function submix(suppliers) {
-        var i = 0, l = arguments.length;
-        if (this === globe) {
-            throw new Error('@this'); 
-        }
-        while (i < l) {
-            bridge.call(arguments[i++], this, typeof arguments[i] != 'boolean' || arguments[i++]);
+    function submix(s, send, $) {
+        if (this === globe) { throw new Error('@this'); }
+        return bridge.call(s, r, send, $);
+    }
+    
+    /**
+     * @this    {Object|Function} receiver
+     */
+    function tracks() {
+        if (this === globe) { throw new Error('@this'); }
+        var trax = [], l = trax.push.apply(trax, arguments), i = l, ops = 'boolean';
+        ops = typeof trax[--i] == ops || typeof trax[--i] == ops ? trax.splice(i, l = i) : true;
+        for (i = 0; i < l; ) {
+            bridge.apply(trax[i++], [this].concat(ops));
         }
         return this;
     }
     
     submix['bridge'] = bridge;
+    submix['tracks'] = tracks;
     submix['submix'] = submix;
     return submix;
 }));
