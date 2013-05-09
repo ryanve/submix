@@ -3,7 +3,7 @@
  * @author      Ryan Van Etten
  * @link        http://github.com/ryanve/submix
  * @license     MIT
- * @version     0.3.1
+ * @version     0.3.2
  */
 
 /*jshint expr:true, laxcomma:true, sub:true, supernew:true, debug:true, node:true, boss:true, evil:true, 
@@ -40,7 +40,7 @@
         if (custom !== bridge && typeof custom == 'function' && custom['send'] === false) {
             return custom.apply(s, arguments);
         }
-        force = true === force;
+        force = typeof force == 'function' ? !!(send = send || force) : true === force;
         $ = void 0 === $ ? r : $;
         for (k in s) {
             if (null != s[k]) {

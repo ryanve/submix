@@ -1,7 +1,7 @@
 {
     "name": "submix",
     "description": "module integration utility",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "homepage": "https://github.com/ryanve/submix",
     "author": "Ryan Van Etten <ryanve@gmail.com> (http://ryanve.com)",
     "keywords": ["integration", "utility", "ender"],
