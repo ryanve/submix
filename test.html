@@ -18,7 +18,10 @@
     <a href="http://github.com/ryanve/submix">submix</a>: test suite
 </h1>
 
-<main id="main" role="main"></main>
+<main id="main" role="main">
+    <p>Open the console to view results.</p>
+    <p>View the pagesource to view tests.</p>
+</main>
 
 <script src="http://airve.github.io/js/aok/aok.min.js"></script>
 <script src="http://airve.github.io/js/elo/elo.min.js"></script>
@@ -26,13 +29,124 @@
 <script src="submix.js"></script>
 <script>
     (function(document, aok, submix, vibe, elo) {
-        aok.log(submix);
-        aok.log(submix.bridge({}))
-        aok.log(submix.call({ fn: {} }, aok, vibe, elo ));
-        aok.log(submix.submix(elo, vibe, false));
-        aok(typeof submix == 'function');
-        aok(typeof submix.bridge == 'function');
-        aok(submix === submix.submix);
+        var bridge = submix.bridge;
+        function noop() {}
+        function stop() { 
+            return false; 
+        }
+        function two() { 
+            return 2; 
+        }
+        // aok.log(submix);
+        // aok.log(bridge({}))
+        // aok.log(submix.call({ fn: {} }, aok, vibe, elo ));
+        // aok.log(submix.submix(elo, vibe, false));
+        aok({
+            id: 'syncs'
+          , test: submix === submix.submix 
+        });
+        aok({
+            id: 'types'
+          , test: typeof submix == 'function' && typeof bridge == 'function' 
+        });
+        aok({
+            id: 'forcePrecision'
+          , test: function() {
+                return (
+                    // should overwrite only if it is "function" or 3qual to `true`
+                    1 === bridge.call({ a: 1 }, { a: 2 }, true).a
+                 && 2 === bridge.call({ a: 1 }, { a: 2 }, false).a
+                 && 2 === bridge.call({ a: 1 }, { a: 2 }, {}).a
+                 && 2 === bridge.call({ a: 1 }, { a: 2 }, 1).a
+                 && 2 === bridge.call({ a: 1 }, { a: 2 }, null).a
+                );
+            }
+        });
+        aok({
+            id: 'sendParamFires'
+          , test: function() {
+                var bool = false;
+                return bridge.call({ a: 1 }, { a: 2 }, function() {
+                    bool = true;
+                }), bool;
+            }
+        });
+        aok({
+            id: 'sendParamDefers'
+          , test: function() {
+                return 1 === (bridge.call({ a: 1 }, {}, noop)).a;
+            }
+        });
+        aok({
+            id: 'sendParamForces'
+          , test: function() {
+                return 1 === bridge.call({ a: 1 }, { a: 2 }, noop).a;
+            }
+        });
+        aok({
+            id: 'sendParamStops'
+          , test: function() {
+                return 2 === bridge.call({ a: 1 }, { a: 2 }, stop).a;
+            }
+        });
+        aok({
+            id: 'sendParamCustomizes'
+          , test: function() {
+                return 2 === bridge.call({ a: 1 }, {}, two).a;
+            }
+        });
+        aok({
+            id: 'sendPropDefers'
+          , test: function() {
+                return 1 === bridge.call({
+                    a: { send: noop } 
+                }, { a: 1 }).a;
+            }
+        });
+        aok({
+            id: 'sendPropStops'
+          , test: function() {
+                return 2 === bridge.call({
+                    a: { send: stop } 
+                }, { a: 2 }).a;
+            }
+        });
+        aok({
+            id: 'sendPropCertifies'
+          , test: function() {
+                var o = { send: true };
+                return o === bridge.call({
+                    a: o
+                }, {}).a;
+            }
+        });
+        aok({
+            id: 'sendPropCustomizes'
+          , test: function() {
+                return 2 === bridge.call({
+                    a: { send: two } 
+                }, {}).a;
+            }
+        });
+        aok({
+            id: 'customBridge'
+          , test: function() {
+                var e = {}, o = {}, c = {}, s;
+                function valid(r, send, $) {
+                    return r === c && s === this && o;
+                }
+                // To be valid as custom, its "send" must 3qual `false`
+                // Otherwise the standard bridge is used.
+                valid['send'] = false;
+                function invalid() {
+                    return o; 
+                }
+                s = { bridge: valid };
+                return o === bridge.call(s, c) && e === bridge.call({
+                    bridge: invalid
+                }, e);
+            }
+        });
     }(document, aok, submix, vibe, elo));
 </script>
 </body>

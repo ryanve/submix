@@ -49,7 +49,7 @@
                     r[k] && bridge.call(s[k], r[k], send, $);
                 } else if (force ? $ !== r[k] : null == r[k]) {
                     custom = send || s[k]['send'];
-                    custom = typeof custom == 'function' ? send.call(s[k], $, r[k]) : false !== custom && s[k];
+                    custom = typeof custom == 'function' ? custom.call(s[k], $, r[k]) : false !== custom && s[k];
                     false === custom || (r[k] = null == custom ? s[k] : custom);
                 }
             }
