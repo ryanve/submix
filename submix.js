@@ -3,7 +3,7 @@
  * @author      Ryan Van Etten
  * @link        http://github.com/ryanve/submix
  * @license     MIT
- * @version     0.3.2
+ * @version     0.3.3
  */
 
 /*jshint expr:true, laxcomma:true, sub:true, supernew:true, debug:true, node:true, boss:true, evil:true, 
@@ -22,17 +22,18 @@
      * If the .send result is null|undefined then supplierItem transfers as is. If
      * the .send result is anything else other than `false`, the result transfers.
      *
-     * @this   {Object|Function}        supplier
-     * @param  {Object|Function} r      receiver
-     * @param  {boolean=}        force  option to overwrite existing props (default: false)
-     * @param  {*=}              $      host api function for sends, or `null` for none
-     *                                  If undefined, defaults to the receiver
-     * @param  {Function=}       send   callback for testing or customizing transferred values
-     *                                  - defaults to the "send" prop of each supplier value
-     *                                  - exact signature is still in development
+     * @this   {Object|Function}            supplier
+     * @param  {Object|Function}     r      receiver
+     * @param  {(boolean|Function)=} send   bool: option to force overwrite (default: false)
+     *                                      func: test or customize transferred values
+     *                                      - defaults to the "send" prop of each supplier value
+     *                                      - exact signature is still in development
+     *                                      - overwrite is implicit unless stopped by `send`
+     * @param  {*=}                  $      host wrapper function for sends, or `null` for none
+     *                                      - if undefined (===) then `$` defaults to `receiver`
      */
-    function bridge(r, force, $, send) {
-        var k, custom, s = this; // supplier
+    function bridge(r, send, $) {
+        var k, custom, force, s = this;
         if (s === globe) {
             throw new Error('@this'); 
         }
@@ -40,12 +41,12 @@
         if (custom !== bridge && typeof custom == 'function' && custom['send'] === false) {
             return custom.apply(s, arguments);
         }
-        force = typeof force == 'function' ? !!(send = send || force) : true === force;
         $ = void 0 === $ ? r : $;
+        (force = typeof send == 'function') || (force = true === send, send = null);
         for (k in s) {
             if (null != s[k]) {
                 if ('fn' === k && s[k] !== s) {
-                    r[k] && bridge.call(s[k], r[k], force, $, send);
+                    r[k] && bridge.call(s[k], r[k], send, $);
                 } else if (force ? $ !== r[k] : null == r[k]) {
                     custom = send || s[k]['send'];
                     custom = typeof custom == 'function' ? send.call(s[k], $, r[k]) : false !== custom && s[k];
