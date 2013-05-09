@@ -68,7 +68,7 @@
      */
     function submix(s, send, $) {
         if (this === globe) { throw new Error('@this'); }
-        return bridge.call(s, r, send, $);
+        return bridge.call(s, this, send, $);
     }
     
     /**
