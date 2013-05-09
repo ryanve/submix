@@ -3,7 +3,7 @@
  * @author      Ryan Van Etten
  * @link        http://github.com/ryanve/submix
  * @license     MIT
- * @version     0.3.0
+ * @version     0.3.1
  */
 
 /*jshint expr:true, laxcomma:true, sub:true, supernew:true, debug:true, node:true, boss:true, evil:true, 
@@ -45,7 +45,7 @@
         for (k in s) {
             if (null != s[k]) {
                 if ('fn' === k && s[k] !== s) {
-                    r[k] && bridge.call(s[k], r[k], force, $);
+                    r[k] && bridge.call(s[k], r[k], force, $, send);
                 } else if (force ? $ !== r[k] : null == r[k]) {
                     custom = send || s[k]['send'];
                     custom = typeof custom == 'function' ? send.call(s[k], $, r[k]) : false !== custom && s[k];
