@@ -3,11 +3,11 @@
  * @author      Ryan Van Etten
  * @link        http://github.com/ryanve/submix
  * @license     MIT
- * @version     0.2.1
+ * @version     0.3.x
  */
 
-/*jshint expr:true, laxcomma:true, sub:true, debug:true, eqnull:true, boss:true, evil:true, undef:true
-, unused:true, browser:true, devel:true, jquery:true, es5:true, node:true, indent:4, maxerr:100 */
+/*jshint expr:true, laxcomma:true, sub:true, supernew:true, debug:true, node:true, boss:true, evil:true, 
+  undef:true, eqnull:true, unused:true, browser:true, devel:true, jquery:true, indent:4, maxerr:100 */
 
 (function(root, name, make) {
     typeof module != 'undefined' && module['exports'] ? module['exports'] = make() : root[name] = make();
@@ -16,7 +16,6 @@
     var globe = this || window;
 
     /**
-     *
      * Integrate a module into a host. Null|undefined items are skipped. Effins bridge 1
      * level deep. Supplier items whose .send property is `false` get skipped. If the
      * .send is a function, it is called as supplierItem.send($, receiverItem)
@@ -28,8 +27,11 @@
      * @param  {boolean=}        force  option to overwrite existing props (default: false)
      * @param  {*=}              $      host api function for sends, or `null` for none
      *                                  If undefined, defaults to the receiver
+     * @param  {Function=}       send   callback for testing or customizing transferred values
+     *                                  - defaults to the "send" prop of each supplier value
+     *                                  - exact signature is still in development
      */
-    function bridge(r, force, $) {
+    function bridge(r, force, $, send) {
         var k, custom, s = this; // supplier
         if (s === globe) {
             throw new Error('@this'); 
@@ -45,8 +47,8 @@
                 if ('fn' === k && s[k] !== s) {
                     r[k] && bridge.call(s[k], r[k], force, $);
                 } else if (force ? $ !== r[k] : null == r[k]) {
-                    custom = s[k]['send'];
-                    custom = typeof custom == 'function' ? s[k]['send']($, r[k]) : false !== custom && s[k];
+                    custom = send || s[k]['send'];
+                    custom = typeof custom == 'function' ? send.call(s[k], $, r[k]) : false !== custom && s[k];
                     false === custom || (r[k] = null == custom ? s[k] : custom);
                 }
             }
