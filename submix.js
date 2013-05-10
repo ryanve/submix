@@ -3,7 +3,7 @@
  * @author      Ryan Van Etten
  * @link        http://github.com/ryanve/submix
  * @license     MIT
- * @version     0.5.0
+ * @version     0.6.0
  */
 
 /*jshint expr:true, laxcomma:true, sub:true, supernew:true, debug:true, node:true, boss:true, evil:true, 
@@ -17,10 +17,10 @@
 
     /**
      * Integrate a module into a host. Null|undefined items are skipped. Effins bridge 1
-     * level deep. Supplier items whose .send property is `false` get skipped. If the
-     * .send is a function, it is called as supplierItem.send($, receiverItem)
-     * If the .send result is null|undefined then supplierItem transfers as is. If
-     * the .send result is anything else other than `false`, the result transfers.
+     * level deep. Supplier items whose .bus property is `false` get skipped. If the
+     * .bus is a function, it is called as supplierItem.bus($, receiverItem)
+     * If the .bus result is null|undefined then supplierItem transfers as is. If
+     * the .bus result is anything else other than `false`, the result transfers.
      *
      * @this   {Object|Function}            supplier
      * @param  {Object|Function}     r      receiver
@@ -34,7 +34,7 @@
      */
     function bridge(r, send, $) {
         var k, force, s = this, custom = s['bridge'];
-        if (custom !== bridge && typeof custom == 'function' && custom['send'] === false) {
+        if (custom !== bridge && typeof custom == 'function' && custom['bus'] === false) {
             // Don't let globe supply to custom bridges. Return `r` regardless.
             return s === globe || custom.apply(s, arguments), r;
         }
@@ -45,7 +45,7 @@
                 if ('fn' === k && s[k] !== s) {
                     r[k] && bridge.call(s[k], r[k], send, $);
                 } else if (force ? $ !== r[k] : null == r[k]) {
-                    custom = send || s[k]['send'];
+                    custom = send || s[k]['bus'];
                     custom = typeof custom == 'function' ? custom.call(s[k], $, r[k]) : false !== custom && s[k];
                     false === custom || (r[k] = null == custom ? s[k] : custom);
                 }
@@ -54,10 +54,9 @@
         return r;
     }
 
-    // certify that the bridge is universal
-    bridge['send'] = true;
-    
-    
+    // affirm that the bridge is universal (for detection as such)
+    bridge['bus'] = true;
+
     /**
      * Like bridge, but with semi-inverted signature
      * @this   {Object|Function}            receiver
@@ -75,7 +74,6 @@
     
     /**
      * @this  {Object|Function}
-     * @param {Object|Function}
      * If multiple "tracks" are passed, the zeroith becomes the receiver and
      * the rest become suppliers. Otherwise `this` receives the supplier (in 
      * which case the receiver defers to a plain object if `this` is the globe.)

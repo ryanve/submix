@@ -114,35 +114,35 @@
             }
         });
         aok({
-            id: 'sendPropDefers'
+            id: 'busPropDefers'
           , test: function() {
                 return 1 === bridge.call({
-                    a: { send: noop } 
+                    a: { bus: noop } 
                 }, { a: 1 }).a;
             }
         });
         aok({
-            id: 'sendPropStops'
+            id: 'busPropStops'
           , test: function() {
                 return 2 === bridge.call({
-                    a: { send: stop } 
+                    a: { bus: stop } 
                 }, { a: 2 }).a;
             }
         });
         aok({
-            id: 'sendPropCertifies'
+            id: 'busPropCertifies'
           , test: function() {
-                var o = { send: true };
+                var o = { bus: true };
                 return o === bridge.call({
                     a: o
                 }, {}).a;
             }
         });
         aok({
-            id: 'sendPropCustomizes'
+            id: 'busPropCustomizes'
           , test: function() {
                 return 2 === bridge.call({
-                    a: { send: two } 
+                    a: { bus: two } 
                 }, {}).a;
             }
         });
@@ -150,12 +150,12 @@
             id: 'customBridge'
           , test: function() {
                 var e = {}, o = {}, c = {}, s;
-                function valid(r, send, $) {
+                function valid(r) {
                     return r === c && s === this && c;
                 }
-                // To be valid as custom, its "send" must 3qual `false`
+                // To be valid as custom, its "bus" must 3qual `false`
                 // Otherwise the standard bridge is used.
-                valid['send'] = false;
+                valid['bus'] = false;
                 function invalid() {}
                 s = { bridge: valid };
                 return c === bridge.call(s, c) && e === bridge.call({
