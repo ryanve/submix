@@ -3,7 +3,7 @@
  * @author      Ryan Van Etten
  * @link        http://github.com/ryanve/submix
  * @license     MIT
- * @version     0.4.0
+ * @version     0.4.1
  */
 
 /*jshint expr:true, laxcomma:true, sub:true, supernew:true, debug:true, node:true, boss:true, evil:true, 
@@ -79,8 +79,9 @@
         var ops, trax = [], l = trax.push.apply(trax, arguments), i = l;
         // Extract the send/$ options if included. Else set `ops` to `true` to force overwrite.
         ops = typeof trax[--i] != 'boolean' && typeof trax[--i] != 'boolean' || trax.splice(i, l = i);
+        ops = [this].concat(ops);
         for (i = 0; i < l; ) {
-            bridge.apply(trax[i++], [this].concat(ops));
+            bridge.apply(trax[i++], ops);
         }
         return this;
     }
