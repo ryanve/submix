@@ -76,8 +76,9 @@
      */
     function tracks() {
         if (this === globe) { throw new Error('@this'); }
-        var trax = [], l = trax.push.apply(trax, arguments), i = l, ops = 'boolean';
-        ops = typeof trax[--i] == ops || typeof trax[--i] == ops ? trax.splice(i, l = i) : true;
+        var ops, trax = [], l = trax.push.apply(trax, arguments), i = l;
+        // Extract the send/$ options if included. Else set `ops` to `true` to force overwrite.
+        ops = typeof trax[--i] != 'boolean' && typeof trax[--i] != 'boolean' || trax.splice(i, l = i);
         for (i = 0; i < l; ) {
             bridge.apply(trax[i++], [this].concat(ops));
         }
