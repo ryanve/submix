@@ -32,6 +32,7 @@
     (function(document, aok, submix, vibe, elo) {
         var bridge = submix.bridge
           , tracks = submix.tracks;
+
         function noop() {}
         function stop() { 
             return false; 
@@ -50,6 +51,21 @@
         aok({
             id: 'types'
           , test: typeof submix == 'function' && typeof bridge == 'function' 
+        });
+        aok({
+            id: 'protectGlobe'
+          , test: function() {
+                var globe = window, a = globe.a, bool;
+                return elo.each([tracks, submix], function(method) {
+                    return bool = (
+                        globe !== method.call(null, { a: 1 })
+                     && globe !== method.call(globe, { a: 1 })
+                     && globe !== method.call(globe, { a: 1 }, true)
+                     && 1 === method.call(globe, { a: 1 }, true).a
+                     && '[object Object]' === method.call(globe, { a: 1 }).toString()
+                    );
+                }), bool && a === globe.a; 
+            }
         });
         aok({
             id: 'forcePrecision'
