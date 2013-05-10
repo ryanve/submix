@@ -3,7 +3,7 @@
  * @author      Ryan Van Etten
  * @link        http://github.com/ryanve/submix
  * @license     MIT
- * @version     0.4.2
+ * @version     0.4.3
  */
 
 /*jshint expr:true, laxcomma:true, sub:true, supernew:true, debug:true, node:true, boss:true, evil:true, 
@@ -70,26 +70,21 @@
      * @param  {*=}                  $
      */
     function submix(s, send, $) {
-        if (this === globe) {
-            try { throw new Error('@this'); }
-            catch (e) { console.error(e.stack); }
-        }
-        return bridge.call(s, this, send, $);
+        return bridge.call(s, this === globe ? {} : this, send, $);
     }
     
     /**
      * @this    {Object|Function} receiver
      */
     function tracks() {
-        if (this === globe) { throw new Error('@this'); }
-        var ops, trax = [], l = trax.push.apply(trax, arguments), i = l;
+        var ops, target, trax = [], l = trax.push.apply(trax, arguments), i = l;
         // Extract the send/$ options if included. Else set `ops` to `true` to force overwrite.
         ops = typeof trax[--i] != 'boolean' && typeof trax[--i] != 'boolean' || trax.splice(i, l = i);
-        ops = [this].concat(ops);
+        ops = [target = this === globe ? {} : this].concat(ops);
         for (i = 0; i < l; ) {
             bridge.apply(trax[i++], ops);
         }
-        return this;
+        return target;
     }
     
     submix['bridge'] = bridge;
