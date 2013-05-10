@@ -3,7 +3,7 @@
  * @author      Ryan Van Etten
  * @link        http://github.com/ryanve/submix
  * @license     MIT
- * @version     0.4.4
+ * @version     0.5.0
  */
 
 /*jshint expr:true, laxcomma:true, sub:true, supernew:true, debug:true, node:true, boss:true, evil:true, 
@@ -69,20 +69,27 @@
         return bridge.call(s, this === globe ? {} : this, send, $);
     }
     
+    // tracks() differs from submix() in 2 ways:
+    // - submix() accepts 1 supplier and does not overwrite by default.
+    // - tracks() accepts multiple suppliers and forces overwrite by default.
+    
     /**
-     * @this    {Object|Function} receiver
+     * @this  {Object|Function}
+     * @param {Object|Function}
+     * If multiple "tracks" are passed, the zeroith becomes the receiver and
+     * the rest become suppliers. Otherwise `this` receives the supplier (in 
+     * which case the receiver defers to a plain object if `this` is the globe.)
+     * Other args (options) may be passed starting at the last boolean arg.
      */
     function tracks() {
-        var ops, target, trax = [], l = trax.push.apply(trax, arguments), i = l;
+        var ops, receiver, trax = [], x = trax.push.apply(trax, arguments), i = x, j = 0;
         // Extract the send/$ options if included. Else set `ops` to `true` to force overwrite.
-        ops = typeof trax[--i] != 'boolean' && typeof trax[--i] != 'boolean' || trax.splice(i, l = i);
-        ops = [target = this === globe ? {} : this].concat(ops);
-        for (i = 0; i < l; ) {
-            bridge.apply(trax[i++], ops);
-        }
-        return target;
+        ops = typeof trax[--i] != 'boolean' && typeof trax[--i] != 'boolean' || trax.splice(x = i, 2);
+        ops = [receiver = 1 < x ? trax[j++] : this === globe ? {} : this].concat(ops);
+        while (j < x) bridge.apply(trax[j++], ops);
+        return receiver;
     }
-    
+
     submix['bridge'] = bridge;
     submix['tracks'] = tracks;
     submix['submix'] = submix;
