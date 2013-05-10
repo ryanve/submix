@@ -151,16 +151,14 @@
           , test: function() {
                 var e = {}, o = {}, c = {}, s;
                 function valid(r, send, $) {
-                    return r === c && s === this && o;
+                    return r === c && s === this && c;
                 }
                 // To be valid as custom, its "send" must 3qual `false`
                 // Otherwise the standard bridge is used.
                 valid['send'] = false;
-                function invalid() {
-                    return o; 
-                }
+                function invalid() {}
                 s = { bridge: valid };
-                return o === bridge.call(s, c) && e === bridge.call({
+                return c === bridge.call(s, c) && e === bridge.call({
                     bridge: invalid
                 }, e);
             }

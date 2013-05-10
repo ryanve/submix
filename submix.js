@@ -3,7 +3,7 @@
  * @author      Ryan Van Etten
  * @link        http://github.com/ryanve/submix
  * @license     MIT
- * @version     0.4.3
+ * @version     0.4.4
  */
 
 /*jshint expr:true, laxcomma:true, sub:true, supernew:true, debug:true, node:true, boss:true, evil:true, 
@@ -33,14 +33,10 @@
      *                                      - if undefined (===) then `$` defaults to `receiver`
      */
     function bridge(r, send, $) {
-        var k, custom, force, s = this;
-        if (s === globe) {
-            try { throw new Error('@this'); }
-            catch (e) { console.error(e.stack); }
-        }
-        custom = s['bridge'];
+        var k, force, s = this, custom = s['bridge'];
         if (custom !== bridge && typeof custom == 'function' && custom['send'] === false) {
-            return custom.apply(s, arguments);
+            // Don't let globe supply to custom bridges. Return `r` regardless.
+            return s === globe || custom.apply(s, arguments), r;
         }
         $ = void 0 === $ ? r : $;
         (force = typeof send == 'function') || (force = true === send, send = null);
