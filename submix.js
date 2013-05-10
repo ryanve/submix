@@ -3,7 +3,7 @@
  * @author      Ryan Van Etten
  * @link        http://github.com/ryanve/submix
  * @license     MIT
- * @version     0.6.0
+ * @version     0.6.1
  */
 
 /*jshint expr:true, laxcomma:true, sub:true, supernew:true, debug:true, node:true, boss:true, evil:true, 
@@ -29,8 +29,8 @@
      *                                      - defaults to the "send" prop of each supplier value
      *                                      - exact signature is still in development
      *                                      - overwrite is implicit unless stopped by `send`
-     * @param  {*=}                  $      host wrapper function for sends, or `null` for none
-     *                                      - if undefined (===) then `$` defaults to `receiver`
+     * @param  {*=}                  $      host wrapper function for sends, or `false` for none
+     *                                      - if null|undefined then `$` defaults to `receiver`
      */
     function bridge(r, send, $) {
         var k, force, s = this, custom = s['bridge'];
@@ -38,7 +38,7 @@
             // Don't let globe supply to custom bridges. Return `r` regardless.
             return s === globe || custom.apply(s, arguments), r;
         }
-        $ = void 0 === $ ? r : $;
+        $ = null == $ ? r : $;
         (force = typeof send == 'function') || (force = true === send, send = null);
         for (k in s) {
             if (null != s[k]) {
