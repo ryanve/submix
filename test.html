@@ -30,7 +30,8 @@
 <script src="submix.js"></script>
 <script>
     (function(document, aok, submix, vibe, elo) {
-        var bridge = submix.bridge;
+        var bridge = submix.bridge
+          , tracks = submix.tracks;
         function noop() {}
         function stop() { 
             return false; 
@@ -146,6 +147,24 @@
                 return o === bridge.call(s, c) && e === bridge.call({
                     bridge: invalid
                 }, e);
+            }
+        });
+        aok({
+            id: 'tracksSansOptions'
+          , test: function() {
+                // It should force overwrite by default.
+                return 3 === tracks.call({}, { a: 1 }, { a: 2 }, { a: 3 }).a;
+            }
+        });
+        aok({
+            id: 'tracksWithOptions'
+          , test: function() {
+                return (
+                    1 === tracks.call({ a: 1 }, { a: 2 }, { a: 3 }, false).a
+                 && 1 === tracks.call({ a: 1 }, { a: 2 }, { a: 3 }, false, noop).a
+                 && 3 === tracks.call({ a: 1 }, { a: 2 }, { a: 3 }, true).a
+                 && 3 === tracks.call({ a: 1 }, { a: 2 }, { a: 3 }, true, noop).a
+                );
             }
         });
     }(document, aok, submix, vibe, elo));
