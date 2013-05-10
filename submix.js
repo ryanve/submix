@@ -3,7 +3,7 @@
  * @author      Ryan Van Etten
  * @link        http://github.com/ryanve/submix
  * @license     MIT
- * @version     0.4.1
+ * @version     0.4.2
  */
 
 /*jshint expr:true, laxcomma:true, sub:true, supernew:true, debug:true, node:true, boss:true, evil:true, 
@@ -34,7 +34,10 @@
      */
     function bridge(r, send, $) {
         var k, custom, force, s = this;
-        if (s === globe) { throw new Error('@this'); }
+        if (s === globe) {
+            try { throw new Error('@this'); }
+            catch (e) { console.error(e.stack); }
+        }
         custom = s['bridge'];
         if (custom !== bridge && typeof custom == 'function' && custom['send'] === false) {
             return custom.apply(s, arguments);
@@ -67,7 +70,10 @@
      * @param  {*=}                  $
      */
     function submix(s, send, $) {
-        if (this === globe) { throw new Error('@this'); }
+        if (this === globe) {
+            try { throw new Error('@this'); }
+            catch (e) { console.error(e.stack); }
+        }
         return bridge.call(s, this, send, $);
     }
     
