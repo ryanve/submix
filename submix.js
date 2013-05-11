@@ -3,7 +3,7 @@
  * @author      Ryan Van Etten
  * @link        http://github.com/ryanve/submix
  * @license     MIT
- * @version     0.6.2
+ * @version     0.7.0
  */
 
 /*jshint expr:true, laxcomma:true, sub:true, supernew:true, debug:true, node:true, boss:true, evil:true, 
@@ -16,38 +16,44 @@
     var globe = this || window;
 
     /**
-     * Integrate a module into a host. Null|undefined items are skipped. Effins bridge 1
-     * level deep. Supplier items whose .bus property is `false` get skipped. If the
-     * .bus is a function, it is called as supplierItem.bus($, receiverItem)
-     * If the .bus result is null|undefined then supplierItem transfers as is. If
-     * the .bus result is anything else other than `false`, the result transfers.
+     * Integrate a module into a host. null|undefined items are skipped. Effins bridge
+     * a level deep. Supplier items whose .bus property is `false` are skipped. If the
+     * .bus is a function, it is used to determine or modify the transferred value:
+     * - If the .bus result is null|undefined then supplier item transfers as it was.
+     * - If the .bus result is anything else other than `false`, its result transfers.
+     * Function `send` params fire on each item and take precedence over .bus.
      *
      * @this   {Object|Function}            supplier
-     * @param  {Object|Function}     r      receiver
-     * @param  {(boolean|Function)=} send   bool: option to force overwrite (default: false)
+     * @param  {Object|Function}       r    receiver
+     * @param  {(boolean|Function|*)=} send bool: option to force overwrite (default: false)
      *                                      func: test or customize transferred values
-     *                                      - defaults to the "send" prop of each supplier value
-     *                                      - exact signature is still in development
-     *                                      - overwrite is implicit unless stopped by `send`
-     * @param  {*=}                  $      host wrapper function for sends, or `null` for none
-     *                                      - if undefined (===) then `$` defaults to `receiver`
+     *                                      - defaults to the .bus prop of each supplier value
+     *                                      - takes precedence over .bus
+     *                                      - forces overwrite unless result is `false`
+     *                                      - null|undefined results revert to their orig value
+     *                                      - supplierItem.bus($, receiverItem) is the working signature
+     *                                      - if 3qual to `bridge`, avoid custom bridges (and buses)
+     * @param  {*=}                    $    host (main wrapper function) for usage in sends/buses
+     *                                      - if `$` is `undefined`, default to `receiver`
+     *                                      - if `$` 3quals `bridge`, ignore 'bus' methods
      */
     function bridge(r, send, $) {
-        var k, force, s = this, custom = s['bridge'];
-        if (custom !== bridge && typeof custom == 'function' && custom['bus'] === false) {
-            // Don't let globe supply to custom bridges. Return `r` regardless.
-            return s === globe || custom.apply(s, arguments), r;
+        var k, b, force = !!send, s = this;
+        send = typeof send == 'function' && send !== bridge && send; // false|function
+        if (!send && typeof(b = s['bridge']) == 'function' && b !== bridge && b['bus'] === false) {
+            // Protect globe. Run conformant custom bridges. Ensure `r` returns.
+            return s === globe || b.apply(s, arguments), r;
         }
-        $ = void 0 === $ ? r : $;
-        (force = typeof send == 'function') || (force = true === send, send = null);
+        $ === bridge ? (send = 1) : ($ = void 0 === $ ? r : $); // see docs above
+        $ = typeof $ == 'function' && $; // ensure false|function
         for (k in s) {
             if (null != s[k]) {
-                if ('fn' === k && s[k] !== s) {
-                    r[k] && bridge.call(s[k], r[k], send, $);
+                if ('fn' === k && r[k] && s[k] !== s) {
+                    bridge.call(s[k], r[k], send, $);
                 } else if (force ? $ !== r[k] : null == r[k]) {
-                    custom = send || s[k]['bus'];
-                    custom = typeof custom == 'function' ? custom.call(s[k], $, r[k]) : false !== custom && s[k];
-                    false === custom || (r[k] = null == custom ? s[k] : custom);
+                    b = send || s[k]['bus'];
+                    b = typeof b == 'function' ? b.call(s[k], $, r[k]) : false !== b && s[k];
+                    false === b || (r[k] = null == b ? s[k] : b);
                 }
             }
         }
@@ -82,9 +88,11 @@
     function tracks() {
         var ops, receiver, trax = [], x = trax.push.apply(trax, arguments), i = x, j = 0;
         // Extract the send/$ options if included. Else set `ops` to `true` to force overwrite.
-        ops = typeof trax[--i] != 'boolean' && typeof trax[--i] != 'boolean' || trax.splice(x = i, 2);
+        ops = typeof trax[i-=2] != 'boolean' && typeof trax[++i] != 'boolean' || trax.splice(x = i, 2);
         ops = [receiver = 1 < x ? trax[j++] : this === globe ? {} : this].concat(ops);
-        while (j < x) bridge.apply(trax[j++], ops);
+        for (; j < x; j++) { 
+            null == trax[j] || bridge.apply(trax[j], ops);
+        }
         return receiver;
     }
 
