@@ -3,7 +3,7 @@
  * @author      Ryan Van Etten
  * @link        http://github.com/ryanve/submix
  * @license     MIT
- * @version     0.7.0
+ * @version     0.7.1
  */
 
 /*jshint expr:true, laxcomma:true, sub:true, supernew:true, debug:true, node:true, boss:true, evil:true, 
@@ -23,37 +23,36 @@
      * - If the .bus result is anything else other than `false`, its result transfers.
      * Function `send` params fire on each item and take precedence over .bus.
      *
-     * @this   {Object|Function}            supplier
-     * @param  {Object|Function}       r    receiver
+     * @this   {Object|Function}            supplier (source)
+     * @param  {Object|Function}       r    receiver (target)
      * @param  {(boolean|Function|*)=} send bool: option to force overwrite (default: false)
-     *                                      func: test or customize transferred values
-     *                                      - defaults to the .bus prop of each supplier value
+     *                                      func: callback to test or customize transferred values:
      *                                      - takes precedence over .bus
-     *                                      - forces overwrite unless result is `false`
+     *                                      - overwrites unless its result is `false`
      *                                      - null|undefined results revert to their orig value
      *                                      - supplierItem.bus($, receiverItem) is the working signature
-     *                                      - if 3qual to `bridge`, avoid custom bridges (and buses)
+     *                                      - if 3qual to `bridge`, avoid custom bridges
      * @param  {*=}                    $    host (main wrapper function) for usage in sends/buses
      *                                      - if `$` is `undefined`, default to `receiver`
      *                                      - if `$` 3quals `bridge`, ignore 'bus' methods
      */
     function bridge(r, send, $) {
-        var k, b, force = !!send, s = this;
-        send = typeof send == 'function' && send !== bridge && send; // false|function
-        if (!send && typeof(b = s['bridge']) == 'function' && b !== bridge && b['bus'] === false) {
-            // Protect globe. Run conformant custom bridges. Ensure `r` returns.
-            return s === globe || b.apply(s, arguments), r;
-        }
-        $ === bridge ? (send = 1) : ($ = void 0 === $ ? r : $); // see docs above
-        $ = typeof $ == 'function' && $; // ensure false|function
-        for (k in s) {
-            if (null != s[k]) {
-                if ('fn' === k && r[k] && s[k] !== s) {
-                    bridge.call(s[k], r[k], send, $);
-                } else if (force ? $ !== r[k] : null == r[k]) {
-                    b = send || s[k]['bus'];
-                    b = typeof b == 'function' ? b.call(s[k], $, r[k]) : false !== b && s[k];
-                    false === b || (r[k] = null == b ? s[k] : b);
+        var k, b, aux, force = !!send, s = this;
+        send !== bridge && (aux = typeof send == 'function' && send);
+        if (false === aux && typeof(b = s['bridge']) == 'function' && b !== bridge && b['bus'] === false) {
+            s === globe || b.apply(s, arguments); // Guard globe. Run conformant custom bridges.
+        } else {
+            $ === bridge ? (aux = aux || 1) : ($ = void 0 === $ ? r : $);
+            $ = typeof $ == 'function' && $;  // Ensure false|function
+            for (k in s) {
+                if (null != s[k]) {
+                    if ('fn' === k && r[k] && s[k] !== s) {
+                        bridge.call(s[k], r[k], send, $);
+                    } else if (force ? $ !== r[k] : null == r[k]) {
+                        b = aux || s[k]['bus'];
+                        b = typeof b == 'function' ? b.call(s[k], $, r[k]) : false !== b && s[k];
+                        false === b || (r[k] = null == b ? s[k] : b);
+                    }
                 }
             }
         }

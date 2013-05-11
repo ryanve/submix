@@ -175,8 +175,31 @@
                 }, e);
             }
         });
+                aok({
+            id: 'switch1'
+          , test: function() {
+                var a = { a: 0 }, b = { a: 1 };
+                a.bridge = function(target) {
+                    target.a = 2;
+                };
+                a.bridge.bus = false;
+                return 0 === bridge.call(a, b, bridge).a;
+            }
+        });
         aok({
-            id: 'tracksSansOptions'
+            id: 'switch2'
+          , test: function() {
+                var a = { a: 0 }, b = { a: 1 }, c = { a: 1 };
+                a.a.bus = two;
+                return (
+                    0 === bridge.call(a, b, true, bridge).a 
+                 && 1 === bridge.call(a, c, false, bridge).a
+                 && 0 === bridge.call(a, c, bridge, bridge).a
+                );
+            }
+        });
+        aok({
+            id: 'tracksDefault'
           , test: function() {
                 // It should force overwrite by default.
                 return (
@@ -187,7 +210,7 @@
             }
         });
         aok({
-            id: 'tracksWithOptions'
+            id: 'tracksOptions'
           , test: function() {
                 return (
                     1 === tracks({ a: 1 }, { a: 2 }, { a: 3 }, false).a
