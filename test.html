@@ -24,13 +24,18 @@
 </main>
 
 <script src="http://airve.github.io/js/aok/aok.min.js"></script>
-<script src="http://airve.github.io/js/dj/dj.min.js"></script>
 <script src="http://airve.github.io/js/elo/elo.min.js"></script>
+<script src="http://airve.github.io/js/dj/dj.min.js"></script>
 <script src="http://airve.github.io/js/vibe/vibe.min.js"></script>
 <script src="submix.js"></script>
 <script>
-    (function(document, aok, submix, vibe, elo) {
-        var bridge = submix.bridge
+    (function(root) {
+        var aok = root.aok
+          , elo = root.elo
+          , vibe = root.vibe
+          , dj = root.dj
+          , submix = root.submix
+          , bridge = submix.bridge
           , tracks = submix.tracks;
 
         function noop() {}
@@ -187,7 +192,7 @@
                 );
             }
         });
-    }(document, aok, submix, vibe, elo));
+    }(this));
 </script>
 </body>
 </html>
