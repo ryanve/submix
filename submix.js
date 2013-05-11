@@ -51,7 +51,7 @@
                     } else if (force ? $ !== r[k] : null == r[k]) {
                         b = aux || s[k]['bus'];
                         b = typeof b == 'function' ? b.call(s[k], $, r[k]) : false !== b && s[k];
-                        false === b || (r[k] = null == b ? s[k] : b);
+                        false !== b && (r[k] = null == b ? s[k] : b);
                     }
                 }
             }
