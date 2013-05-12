@@ -3,7 +3,7 @@
  * @author      Ryan Van Etten
  * @link        http://github.com/ryanve/submix
  * @license     MIT
- * @version     0.7.2
+ * @version     0.7.3
  */
 
 /*jshint expr:true, laxcomma:true, sub:true, supernew:true, debug:true, node:true, boss:true, evil:true, 
@@ -37,7 +37,7 @@
      *                                      - if `$` 3quals `bridge`, ignore 'bus' methods
      */
     function bridge(r, send, $) {
-        var k, b, aux, force = !!send, s = this;
+        var v, k, b, aux, force = !!send, s = this;
         send !== bridge && (aux = typeof send == 'function' && send);
         if (false === aux && typeof(b = s['bridge']) == 'function' && b !== bridge && b['bus'] === false) {
             s === globe || b.apply(s, arguments); // Guard globe. Run conformant custom bridges.
@@ -45,13 +45,13 @@
             $ === bridge ? (aux = aux || 1) : ($ = void 0 === $ ? r : $);
             $ = typeof $ == 'function' && $;  // Ensure false|function
             for (k in s) {
-                if (null != s[k]) {
-                    if ('fn' === k && r[k] && s[k] !== s) {
-                        bridge.call(s[k], r[k], send, $);
+                if (null != (v = s[k])) {
+                    if ('fn' === k && r[k] && v !== s) {
+                        bridge.call(v, r[k], send, $);
                     } else if (force ? $ !== r[k] : null == r[k]) {
-                        b = aux || s[k]['bus'];
-                        b = typeof b == 'function' ? b.call(s[k], $, r[k]) : false !== b && null;
-                        false !== b && (r[k] = null == b ? s[k] : b);
+                        b = aux || v['bus'];
+                        b = typeof b == 'function' ? b.call(v, $, r[k]) : false !== b && null;
+                        false !== b && (r[k] = null == b ? v : b);
                     }
                 }
             }
