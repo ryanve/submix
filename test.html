@@ -34,6 +34,7 @@
           , elo = root.elo
           , vibe = root.vibe
           , dj = root.dj
+          , each = elo.each
           , submix = root.submix
           , bridge = submix.bridge
           , tracks = submix.tracks;
@@ -61,10 +62,21 @@
           , test: typeof submix == 'function' && typeof bridge == 'function' 
         });
         aok({
+            id: 'transferTypes'
+          , test: function() {
+                var bool;
+                return each([[void 0, null], [true, false, 1, '', {}, noop]], function(list, i) {
+                    each(list, function(v) {
+                        return bool = i == ('a' in bridge.call({a:v}, {}));
+                    }); 
+                }), bool;
+            }
+        });
+        aok({
             id: 'protectGlobe'
           , test: function() {
                 var globe = window, a = globe.a, bool;
-                return elo.each([tracks, submix], function(method) {
+                return each([tracks, submix], function(method) {
                     return bool = (
                         globe !== method.call(null, { a: 1 })
                      && globe !== method.call(globe, { a: 1 })

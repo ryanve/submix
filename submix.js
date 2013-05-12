@@ -3,7 +3,7 @@
  * @author      Ryan Van Etten
  * @link        http://github.com/ryanve/submix
  * @license     MIT
- * @version     0.7.1
+ * @version     0.7.2
  */
 
 /*jshint expr:true, laxcomma:true, sub:true, supernew:true, debug:true, node:true, boss:true, evil:true, 
@@ -50,7 +50,7 @@
                         bridge.call(s[k], r[k], send, $);
                     } else if (force ? $ !== r[k] : null == r[k]) {
                         b = aux || s[k]['bus'];
-                        b = typeof b == 'function' ? b.call(s[k], $, r[k]) : false !== b && s[k];
+                        b = typeof b == 'function' ? b.call(s[k], $, r[k]) : false !== b && null;
                         false !== b && (r[k] = null == b ? s[k] : b);
                     }
                 }
