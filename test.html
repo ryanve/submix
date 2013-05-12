@@ -105,6 +105,17 @@
             }
         });
         aok({
+            id: 'effinRecursion'
+          , test: function() {
+                return (
+                    2 === bridge.call({fn: { a: 1 }}, {fn: { a: 2 }}).fn.a
+                 && 1 === bridge.call({fn: { a: 1 }}, {fn: { a: 2 }}, true).fn.a
+                 && !!bridge.call({fn: { a: 1 }}, {}).fn
+                 && 1 === bridge.call({fn: { fn: 1 }}, {}).fn.fn
+                );
+            }
+        });
+        aok({
             id: 'sendParamFires'
           , test: function() {
                 var bool = false;
