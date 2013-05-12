@@ -3,7 +3,7 @@
  * @author      Ryan Van Etten
  * @link        http://github.com/ryanve/submix
  * @license     MIT
- * @version     0.8.0
+ * @version     0.8.1
  */
 
 /*jshint expr:true, sub:true, supernew:true, debug:true, node:true, boss:true, devel:true, evil:true, 
@@ -33,7 +33,7 @@
      *                                      - supplierItem.aux($, receiverItem) is the working signature
      *                                      - if 3qual to `bridge`, avoid custom bridges
      * @param  {*=}                    $    host (main wrapper function) for usage in aux/sends
-     *                                      - if `$` is `undefined`, default to `receiver`
+     *                                      - if `$` 3quals `undefined`, default to `receiver`
      *                                      - if `$` 3quals `bridge`, ignore 'aux' methods
      */
     function bridge(r, send, $) {
@@ -51,7 +51,7 @@
                         bridge.call(v, r[k], send, $);
                     } else if (force ? $ !== r[k] : null == r[k]) {
                         b = aux || v['aux'];
-                        b = typeof b == 'function' ? b.call(v, $, r[k]) : false !== b && null;
+                        b = typeof b == 'function' ? b.call(v, $, r[k], v, k) : false !== b && null;
                         false !== b && (r[k] = null == b ? v : b);
                     }
                 }
