@@ -149,35 +149,35 @@
             }
         });
         aok({
-            id: 'busPropDefers'
+            id: 'auxPropDefers'
           , test: function() {
                 return 1 === bridge.call({
-                    a: { bus: noop } 
+                    a: { aux: noop } 
                 }, { a: 1 }).a;
             }
         });
         aok({
-            id: 'busPropStops'
+            id: 'auxPropStops'
           , test: function() {
                 return 2 === bridge.call({
-                    a: { bus: stop } 
+                    a: { aux: stop } 
                 }, { a: 2 }).a;
             }
         });
         aok({
-            id: 'busPropCertifies'
+            id: 'auxPropCertifies'
           , test: function() {
-                var o = { bus: true };
+                var o = { aux: true };
                 return o === bridge.call({
                     a: o
                 }, {}).a;
             }
         });
         aok({
-            id: 'busPropCustomizes'
+            id: 'auxPropCustomizes'
           , test: function() {
                 return 2 === bridge.call({
-                    a: { bus: two } 
+                    a: { aux: two } 
                 }, {}).a;
             }
         });
@@ -188,9 +188,9 @@
                 function valid(r) {
                     return r === c && s === this && c;
                 }
-                // To be valid as custom, its "bus" must 3qual `false`
+                // To be valid as custom, its 'aux' must 3qual `false`
                 // Otherwise the standard bridge is used.
-                valid['bus'] = false;
+                valid['aux'] = false;
                 function invalid() {}
                 s = { bridge: valid };
                 return c === bridge.call(s, c) && e === bridge.call({
@@ -198,14 +198,14 @@
                 }, e);
             }
         });
-                aok({
+        aok({
             id: 'switch1'
           , test: function() {
                 var a = { a: 0 }, b = { a: 1 };
                 a.bridge = function(target) {
                     target.a = 2;
                 };
-                a.bridge.bus = false;
+                a.bridge.aux = false;
                 return 0 === bridge.call(a, b, bridge).a;
             }
         });
@@ -213,7 +213,7 @@
             id: 'switch2'
           , test: function() {
                 var a = { a: 0 }, b = { a: 1 }, c = { a: 1 };
-                a.a.bus = two;
+                a.a.aux = two;
                 return (
                     0 === bridge.call(a, b, true, bridge).a 
                  && 1 === bridge.call(a, c, false, bridge).a

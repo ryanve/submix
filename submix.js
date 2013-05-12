@@ -3,7 +3,7 @@
  * @author      Ryan Van Etten
  * @link        http://github.com/ryanve/submix
  * @license     MIT
- * @version     0.7.4
+ * @version     0.8.0
  */
 
 /*jshint expr:true, sub:true, supernew:true, debug:true, node:true, boss:true, devel:true, evil:true, 
@@ -17,24 +17,24 @@
 
     /**
      * Integrate a module into a host. null|undefined items are skipped. Effins bridge
-     * a level deep. Supplier items whose .bus property is `false` are skipped. If the
-     * .bus is a function, it is used to determine or modify the transferred value:
-     * - If the .bus result is null|undefined then supplier item transfers as it was.
-     * - If the .bus result is anything else other than `false`, its result transfers.
-     * Function `send` params fire on each item and take precedence over .bus.
+     * a level deep. Supplier items whose .aux property is `false` are skipped. If the
+     * .aux is a function, it is used to determine or modify the transferred value:
+     * - If the .aux result is null|undefined then supplier item transfers as it was.
+     * - If the .aux result is anything else other than `false`, its result transfers.
+     * Function `send` params fire on each item and take precedence over .aux.
      *
      * @this   {Object|Function|Array}      supplier(s)
      * @param  {Object|Function}       r    receiver
      * @param  {(boolean|Function|*)=} send bool: option to force overwrite (default: false)
      *                                      func: callback to test or customize transferred values:
-     *                                      - takes precedence over .bus
+     *                                      - takes precedence over .aux
      *                                      - overwrites unless its result is `false`
      *                                      - null|undefined results revert to their orig value
-     *                                      - supplierItem.bus($, receiverItem) is the working signature
+     *                                      - supplierItem.aux($, receiverItem) is the working signature
      *                                      - if 3qual to `bridge`, avoid custom bridges
-     * @param  {*=}                    $    host (main wrapper function) for usage in sends/buses
+     * @param  {*=}                    $    host (main wrapper function) for usage in aux/sends
      *                                      - if `$` is `undefined`, default to `receiver`
-     *                                      - if `$` 3quals `bridge`, ignore 'bus' methods
+     *                                      - if `$` 3quals `bridge`, ignore 'aux' methods
      */
     function bridge(r, send, $) {
         var v, k, s, b, aux, fwd, force = !!send, sources = [].concat(this), l = sources.length, i = 0;
@@ -43,14 +43,14 @@
         $ = typeof $ == 'function' && $;  // Ensure false|function
         while (i < l) {
             s = sources[i++];
-            if (fwd && typeof(b = s['bridge']) == 'function' && b !== bridge && b['bus'] === false) {
+            if (fwd && typeof(b = s['bridge']) == 'function' && b !== bridge && b['aux'] === false) {
                 s === globe || b.apply(s, arguments); // Guard globe. Run conformant custom bridges.
             } else for (k in s) {
                 if (null != (v = s[k])) {
                     if ('fn' === k && r[k] && v !== s) {
                         bridge.call(v, r[k], send, $);
                     } else if (force ? $ !== r[k] : null == r[k]) {
-                        b = aux || v['bus'];
+                        b = aux || v['aux'];
                         b = typeof b == 'function' ? b.call(v, $, r[k]) : false !== b && null;
                         false !== b && (r[k] = null == b ? v : b);
                     }
@@ -61,7 +61,7 @@
     }
 
     // affirm that the bridge is universal (for detection as such)
-    bridge['bus'] = true;
+    bridge['aux'] = true;
 
     /**
      * Like bridge, but with semi-inverted signature
