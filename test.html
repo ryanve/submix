@@ -67,7 +67,7 @@
                 var bool;
                 return each([[void 0, null], [true, false, 1, '', {}, noop]], function(list, i) {
                     each(list, function(v) {
-                        return bool = i == ('a' in bridge.call({a:v}, {}));
+                        return bool = i == bridge.call({a:v}, {}).hasOwnProperty('a');
                     }); 
                 }), bool;
             }
