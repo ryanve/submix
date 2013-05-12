@@ -3,11 +3,11 @@
  * @author      Ryan Van Etten
  * @link        http://github.com/ryanve/submix
  * @license     MIT
- * @version     0.7.3
+ * @version     0.7.4
  */
 
-/*jshint expr:true, laxcomma:true, sub:true, supernew:true, debug:true, node:true, boss:true, evil:true, 
-  undef:true, eqnull:true, unused:true, browser:true, devel:true, jquery:true, indent:4, maxerr:100 */
+/*jshint expr:true, sub:true, supernew:true, debug:true, node:true, boss:true, devel:true, evil:true, 
+  laxcomma:true, eqnull:true, undef:true, unused:true, browser:true, jquery:true, maxerr:100 */
 
 (function(root, name, make) {
     typeof module != 'undefined' && module['exports'] ? module['exports'] = make() : root[name] = make();
@@ -23,8 +23,8 @@
      * - If the .bus result is anything else other than `false`, its result transfers.
      * Function `send` params fire on each item and take precedence over .bus.
      *
-     * @this   {Object|Function}            supplier (source)
-     * @param  {Object|Function}       r    receiver (target)
+     * @this   {Object|Function|Array}      supplier(s)
+     * @param  {Object|Function}       r    receiver
      * @param  {(boolean|Function|*)=} send bool: option to force overwrite (default: false)
      *                                      func: callback to test or customize transferred values:
      *                                      - takes precedence over .bus
@@ -37,14 +37,15 @@
      *                                      - if `$` 3quals `bridge`, ignore 'bus' methods
      */
     function bridge(r, send, $) {
-        var v, k, b, aux, force = !!send, s = this;
-        send !== bridge && (aux = typeof send == 'function' && send);
-        if (false === aux && typeof(b = s['bridge']) == 'function' && b !== bridge && b['bus'] === false) {
-            s === globe || b.apply(s, arguments); // Guard globe. Run conformant custom bridges.
-        } else {
-            $ === bridge ? (aux = aux || 1) : ($ = void 0 === $ ? r : $);
-            $ = typeof $ == 'function' && $;  // Ensure false|function
-            for (k in s) {
+        var v, k, s, b, aux, fwd, force = !!send, sources = [].concat(this), l = sources.length, i = 0;
+        fwd = send !== bridge && !(aux = typeof send == 'function' && send);
+        $ === bridge ? (aux = aux || 1) : ($ = void 0 === $ ? r : $);
+        $ = typeof $ == 'function' && $;  // Ensure false|function
+        while (i < l) {
+            s = sources[i++];
+            if (fwd && typeof(b = s['bridge']) == 'function' && b !== bridge && b['bus'] === false) {
+                s === globe || b.apply(s, arguments); // Guard globe. Run conformant custom bridges.
+            } else for (k in s) {
                 if (null != (v = s[k])) {
                     if ('fn' === k && r[k] && v !== s) {
                         bridge.call(v, r[k], send, $);
@@ -64,18 +65,18 @@
 
     /**
      * Like bridge, but with semi-inverted signature
-     * @this   {Object|Function}            receiver
-     * @param  {Object|Function}     s      supplier
-     * @param  {(boolean|Function)=} send
-     * @param  {*=}                  $
+     * @this   {Object|Function}             receiver
+     * @param  {Object|Function|Array} s     supplier(s)
+     * @param  {(boolean|Function)=}   send
+     * @param  {*=}                    $
      */
     function submix(s, send, $) {
         return bridge.call(s, this === globe ? {} : this, send, $);
     }
     
     // tracks() differs from submix() in 2 ways:
-    // - submix() accepts 1 supplier and does not overwrite by default.
-    // - tracks() accepts multiple suppliers and forces overwrite by default.
+    // - submix() accepts 1 supplier param and does not overwrite by default.
+    // - tracks() accepts multiple supplier params and forces overwrite by default.
     
     /**
      * @this  {Object|Function}
@@ -85,14 +86,11 @@
      * Other args (options) may be passed starting at the last boolean arg.
      */
     function tracks() {
-        var ops, receiver, trax = [], x = trax.push.apply(trax, arguments), i = x, j = 0;
+        var ops, receiver, trax = [], x = trax.push.apply(trax, arguments), i = x;
         // Extract the send/$ options if included. Else set `ops` to `true` to force overwrite.
         ops = typeof trax[i-=2] != 'boolean' && typeof trax[++i] != 'boolean' || trax.splice(x = i, 2);
-        ops = [receiver = 1 < x ? trax[j++] : this === globe ? {} : this].concat(ops);
-        for (; j < x; j++) { 
-            null == trax[j] || bridge.apply(trax[j], ops);
-        }
-        return receiver;
+        ops = [receiver = 1 < x ? trax.shift() : this === globe ? {} : this].concat(ops);
+        return bridge.apply(trax, ops);
     }
 
     submix['bridge'] = bridge;
