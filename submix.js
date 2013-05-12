@@ -30,7 +30,7 @@
      *                                      - takes precedence over .aux
      *                                      - overwrites unless its result is `false`
      *                                      - null|undefined results revert to their orig value
-     *                                      - supplierItem.aux($, receiverItem) is the working signature
+     *                                      - sourceValue.aux($, targetValue, sourceValue, key)
      *                                      - if 3qual to `bridge`, avoid custom bridges
      * @param  {*=}                    $    host (main wrapper function) for usage in aux/sends
      *                                      - if `$` 3quals `undefined`, default to `receiver`
